@@ -1,7 +1,7 @@
 package com.example.simone.bakingapp.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,8 +12,8 @@ public class Sweet implements Parcelable {
 
     private Integer id;
     private String name;
-    private List<Ingredient> ingredients = null;
-    private List<Step> steps = null;
+    private ArrayList<Ingredient> ingredients = null;
+    private ArrayList<Step> steps = null;
     private Integer servings;
     private String image;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -58,7 +58,7 @@ public class Sweet implements Parcelable {
      * @param image
      * @param steps
      */
-    public Sweet(Integer id, String name, List<Ingredient> ingredients, List<Step> steps, Integer servings, String image) {
+    public Sweet(Integer id, String name, ArrayList<Ingredient> ingredients, ArrayList<Step> steps, Integer servings, String image) {
         super();
         this.id = id;
         this.name = name;
@@ -84,19 +84,19 @@ public class Sweet implements Parcelable {
         this.name = name;
     }
 
-    public List<Ingredient> getIngredients() {
+    public ArrayList<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(ArrayList<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 
-    public List<Step> getSteps() {
+    public ArrayList<Step> getSteps() {
         return steps;
     }
 
-    public void setSteps(List<Step> steps) {
+    public void setSteps(ArrayList<Step> steps) {
         this.steps = steps;
     }
 

@@ -11,7 +11,7 @@ import android.os.Parcelable;
  */
 public class Ingredient implements Parcelable {
 
-    private Integer quantity;
+    private long quantity;
     private String measure;
     private String ingredient;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -31,7 +31,7 @@ public class Ingredient implements Parcelable {
             ;
 
     protected Ingredient(Parcel in) {
-        this.quantity = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.quantity = ((long) in.readValue((long.class.getClassLoader())));
         this.measure = ((String) in.readValue((String.class.getClassLoader())));
         this.ingredient = ((String) in.readValue((String.class.getClassLoader())));
         this.additionalProperties = ((Map<String, Object> ) in.readValue((Map.class.getClassLoader())));
@@ -57,11 +57,11 @@ public class Ingredient implements Parcelable {
         this.ingredient = ingredient;
     }
 
-    public Integer getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
