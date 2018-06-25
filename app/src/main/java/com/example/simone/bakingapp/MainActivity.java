@@ -1,23 +1,20 @@
 package com.example.simone.bakingapp;
 
-import android.os.Handler;
-import android.os.Parcelable;
+import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.util.Log;
+import android.widget.Toast;
 
-import com.example.simone.bakingapp.async.AsyncTaskCompleteListener;
-import com.example.simone.bakingapp.async.RetrieveSweetsTask;
+import com.example.simone.bakingapp.fragments.IngredientsFragment;
+import com.example.simone.bakingapp.fragments.StepsFragment;
+import com.example.simone.bakingapp.fragments.SweetListMasterFragment;
+import com.example.simone.bakingapp.model.Ingredient;
+import com.example.simone.bakingapp.model.Step;
 import com.example.simone.bakingapp.model.Sweet;
-import com.example.simone.bakingapp.utils.JsonUtils;
-import com.example.simone.bakingapp.utils.NetworkUtils;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -25,99 +22,67 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
-        implements SweetsAdapter.ListSweetClickListener{
-
-    @BindView(R.id.rv_sweets_list) RecyclerView sweetList;
-    @BindView(R.id.pb_sweets_list) ProgressBar mProgressBar;
-    @BindView(R.id.tv_internet_error) TextView mInternetMessage;
-    @BindView(R.id.iv_internet_error) ImageView mInternetImageView;
+    implements SweetListMasterFragment.OnSweetClickListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private SweetsAdapter sweetsAdapter;
-    private ArrayList<Sweet> mSweetList;
+    private static final String TAG_SWEET_MASTER_FRAGMENT = SweetListMasterFragment.class.getSimpleName();
+    private static final String TAG_INGREDIENTS_FRAGMENT = IngredientsFragment.class.getSimpleName();
+    private static final String TAG_STEPS_FRAGMENT = StepsFragment.class.getSimpleName();
+    public static final String FRAGMENT_BACKSTACK = "ReturnToCorrectFragmentLessie";
 
-    private static final String LAST_POSITION_RV = "last.recycler.layout";
-    private Parcelable mSavedRecyclerLayoutState;
+    @BindView(R.id.cl_tablet_view) ConstraintLayout mConstraintLayoutTabletView;
+    private IngredientsFragment mIngredientsFragment;
+    private ArrayList<Ingredient> mIngredientList;
+    private StepsFragment mStepsFragment;
+    private ArrayList<Step> mStepsList;
+    boolean mAlignVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        sweetList.setLayoutManager(linearLayoutManager);
-        sweetList.setHasFixedSize(true);
-
-        startRetrievingSweetsInfo();
-
-        sweetsAdapter = new SweetsAdapter(this, mSweetList, this);
-        sweetList.setAdapter(sweetsAdapter);
+        if (mConstraintLayoutTabletView != null){
+            mAlignVersion = true;
+            if (savedInstanceState == null){
+                mIngredientsFragment = IngredientsFragment.newInstance(mIngredientList);
+                mStepsFragment = StepsFragment.newInstance(mStepsList);
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.f_ingredients, mIngredientsFragment, TAG_INGREDIENTS_FRAGMENT)
+                        .add(R.id.f_steps, mStepsFragment, TAG_STEPS_FRAGMENT)
+                        .commit();
+            }
+        }else {
+            mAlignVersion = false;
+        }
+        Log.d(TAG,"Siamo in un tablet? " + ((mAlignVersion) ? "SI!" : "NO!"));
 
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(LAST_POSITION_RV, sweetList.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null){
-            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
-            sweetList.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
-        }
+
     }
 
     @Override
-    public void onListSweetClick(Sweet sweetClicked) {
+    public void onSweetSelected(Sweet sweetClicked) {
+        Toast.makeText(this,"Sweet clicked: " + sweetClicked.toString(),Toast.LENGTH_SHORT).show();
+        if (mAlignVersion){
+            mIngredientList = sweetClicked.getIngredients();
+            mStepsList = sweetClicked.getSteps();
+            mIngredientsFragment.updateData(mIngredientList);
 
-    }
-
-    public void startRetrievingSweetsInfo(){
-        if (NetworkUtils.isNetworkAvailable(this)){
-            new RetrieveSweetsTask(this, new AsyncTaskCompleteListener<String>() {
-                @Override
-                public void onPreTaskExecute() {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    mInternetMessage.setVisibility(View.GONE);
-                    mInternetImageView.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onTaskComplete(String result) {
-                    mProgressBar.setVisibility(View.GONE);
-                    if (result != null && !result.isEmpty()){
-                        try{
-                            mSweetList = new JsonUtils().parseAnswerJson(result);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        sweetsAdapter.updateData(mSweetList);
-                        if (mSavedRecyclerLayoutState != null){
-                            sweetList.getLayoutManager()
-                                    .onRestoreInstanceState(mSavedRecyclerLayoutState);
-                        }
-                    }
-                }
-            }).execute();
-        }else{
-            connectionMissing();
+        }else {
+            Intent startDescriptionActivityIntent = new Intent(this, DescriptionActivity.class);
+            startDescriptionActivityIntent.putExtra("SweetObj", sweetClicked);
+            startActivity(startDescriptionActivityIntent);
         }
-    }
 
-    public void connectionMissing(){
-        mInternetMessage.setText(R.string.tv_internet_no_connection);
-        mInternetMessage.setVisibility(View.VISIBLE);
-        mInternetImageView.setVisibility(View.VISIBLE);
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startRetrievingSweetsInfo();
-            }
-        }, 1000);
     }
 }

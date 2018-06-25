@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.SweetListMasterFragment">
+
+    <ImageView
+        android:id="@+id/iv_top_rv"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        android:scrollY="-30dp"
+        android:contentDescription="@string/iv_top_image_description"
+        app:layout_constraintBottom_toTopOf="@+id/rv_sweets_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/top_image" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_sweets_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:contentDescription="@string/rv_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_top_rv" />
+
+    <ProgressBar
+        android:id="@+id/pb_sweets_list"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rv_sweets_list"
+        app:layout_constraintEnd_toEndOf="@id/rv_sweets_list"
+        app:layout_constraintStart_toStartOf="@id/rv_sweets_list"
+        app:layout_constraintTop_toTopOf="@id/rv_sweets_list" />
+
+    <TextView
+        android:id="@+id/tv_internet_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:textColor="@color/textError"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/rv_sweets_list"
+        app:layout_constraintStart_toStartOf="@id/rv_sweets_list"
+        app:layout_constraintTop_toTopOf="@id/rv_sweets_list" />
+    <ImageView
+        android:id="@+id/iv_internet_error"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/iv_internet_error_description"
+        android:src="@android:drawable/ic_dialog_alert"
+        android:visibility="gone"
+        android:textColor="@color/textError"
+        app:layout_constraintEnd_toEndOf="@id/rv_sweets_list"
+        app:layout_constraintStart_toStartOf="@id/rv_sweets_list"
+        app:layout_constraintTop_toBottomOf="@id/tv_internet_error" />
+
+</android.support.constraint.ConstraintLayout>
