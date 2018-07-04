@@ -35,8 +35,8 @@ public class Sweet implements Parcelable {
     protected Sweet(Parcel in) {
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.name = ((String) in.readValue((String.class.getClassLoader())));
-        in.readList(this.ingredients, (com.example.simone.bakingapp.model.Ingredient.class.getClassLoader()));
-        in.readList(this.steps, (com.example.simone.bakingapp.model.Step.class.getClassLoader()));
+        this.ingredients = (ArrayList<Ingredient>) in.readArrayList(Ingredient.class.getClassLoader());
+        this.steps = (ArrayList<Step>) in.readArrayList(Step.class.getClassLoader());
         this.servings = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.image = ((String) in.readValue((String.class.getClassLoader())));
         this.additionalProperties = ((Map<String, Object> ) in.readValue((Map.class.getClassLoader())));

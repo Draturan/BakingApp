@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- SWEET FRAGMENT-->
     <dimen name="card_margin_spacing">8dp</dimen>
     <dimen name="card_margin_text_spacing">8dp</dimen>
     <dimen name="card_image_dimension">70dp</dimen>
+
+    <!-- DESCRIPTION SECTION -->
+    <dimen name="nothing_selected_margin_tv">5dp</dimen>
+
+    <!-- INGREDIENTS FRAGMENT -->
+    <dimen name="ingredients_list_title_text_size">20sp</dimen>
+    <dimen name="ingredients_list_title_padding">8dp</dimen>
+    <dimen name="ingredients_list_padding">4dp</dimen>
+    <dimen name="ingredients_list_ingredient_padding">8dp</dimen>
+    <dimen name="ingredients_quantity_text_size">20sp</dimen>
+    <dimen name="ingredients_measure_text_size">16sp</dimen>
+    <dimen name="ingredients_ingredient_text_size">12sp</dimen>
+
+    <!-- STEPS FRAGMENT -->
+    <dimen name="steps_list_title_text_size">20sp</dimen>
+    <dimen name="steps_list_title_padding">8dp</dimen>
+    <dimen name="steps_list_padding">4dp</dimen>
+
 
 </resources>

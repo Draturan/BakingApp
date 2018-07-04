@@ -1,11 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:padding="@dimen/ingredients_list_padding">
 
     <TextView
         android:id="@+id/ingredients_tv_quantity"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:padding="@dimen/ingredients_list_padding"
+        android:textAlignment="textEnd"
+        android:textSize="@dimen/ingredients_quantity_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/ingredients_tv_measure"
+        android:layout_width="70dp"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:padding="@dimen/ingredients_list_padding"
+        android:textSize="@dimen/ingredients_measure_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ingredients_tv_quantity"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ingredients_tv_ingredient"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center_vertical"
+        android:padding="@dimen/ingredients_list_ingredient_padding"
+        android:textSize="@dimen/ingredients_ingredient_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ingredients_tv_measure"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

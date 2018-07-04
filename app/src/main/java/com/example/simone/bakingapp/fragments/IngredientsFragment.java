@@ -1,17 +1,18 @@
 package com.example.simone.bakingapp.fragments;
 
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.model.Ingredient;
-import com.example.simone.bakingapp.model.Sweet;
 
 import java.util.ArrayList;
 
@@ -20,11 +21,10 @@ import butterknife.ButterKnife;
 
 public class IngredientsFragment extends Fragment {
 
+    public static final String TAG = IngredientsFragment.class.getSimpleName();
     public static final String ARG_INGREDIENTS = "ingredients";
 
     @BindView(R.id.rv_ingredients_list) RecyclerView ListIngredients;
-    private Sweet mSweetClicked;
-    private Ingredient mSweetIngredients;
     private ArrayList<Ingredient> mIngredients;
     private IngredientsAdapter ingredientsAdapter;
 
@@ -66,7 +66,7 @@ public class IngredientsFragment extends Fragment {
         ListIngredients.setLayoutManager(linearLayoutManager);
         ListIngredients.setHasFixedSize(true);
 
-        ingredientsAdapter = new IngredientsAdapter(getContext(),mIngredients);
+        ingredientsAdapter = new IngredientsAdapter(getContext(), mIngredients);
         ListIngredients.setAdapter(ingredientsAdapter);
 
         // Inflate the layout for this fragment
@@ -75,6 +75,7 @@ public class IngredientsFragment extends Fragment {
 
     public void updateData(ArrayList<Ingredient> ingredientArrayList){
         mIngredients = ingredientArrayList;
+        ingredientsAdapter.updateData(mIngredients);
     }
 
 }

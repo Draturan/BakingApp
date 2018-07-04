@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/rv_ingredients_list"
+<android.support.constraint.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.IngredientsFragment" />
+    tools:context=".fragments.IngredientsFragment">
+
+    <TextView
+        android:id="@+id/tv_ingredients_list_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_ingredients_title_list"
+        android:textSize="@dimen/ingredients_list_title_text_size"
+        android:padding="@dimen/ingredients_list_title_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_ingredients_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_ingredients_list_title" />
+
+</android.support.constraint.ConstraintLayout>

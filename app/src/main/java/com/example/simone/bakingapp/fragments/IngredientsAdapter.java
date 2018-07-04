@@ -12,8 +12,10 @@ import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.model.Ingredient;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 /**
@@ -45,7 +47,9 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
     public int getItemCount() { return (mIngredientsList == null) ? 0 : mIngredientsList.size(); }
 
     public class IngredientsViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.ingredients_tv_quantity) TextView mTextView;
+        @BindView(R.id.ingredients_tv_quantity) TextView mTextViewQuantity;
+        @BindView(R.id.ingredients_tv_measure) TextView mTextViewMeasure;
+        @BindView(R.id.ingredients_tv_ingredient) TextView mTextViewIngredient;
 
         public IngredientsViewHolder(View itemView) {
             super(itemView);
@@ -54,8 +58,12 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
         }
 
         public void bind(int position, ArrayList<Ingredient> list){
-            Ingredient ingredient = list.get(position);
-            mTextView.setText(ingredient.getIngredient());
+            if (list != null){
+                Ingredient ingredient = list.get(position);
+                mTextViewQuantity.setText(String.valueOf(ingredient.getQuantity()));
+                mTextViewMeasure.setText(ingredient.getMeasure());
+                mTextViewIngredient.setText(ingredient.getIngredient());
+            }
         }
     }
 

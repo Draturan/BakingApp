@@ -1,11 +1,21 @@
 <resources>
     <string name="app_name">BakingApp</string>
 
+    <!-- SWEET FRAGMENT-->
     <string name="iv_top_image_description">BakingApp image banner</string>
     <string name="rv_description">List of sweets</string>
     <string name="tv_internet_error">Retrieving data error</string>
     <string name="tv_internet_no_connection">No connection found</string>
     <string name="iv_internet_error_description">No Connection Symbol</string>
     <string name="iv_sweet_description">Image of the sweet</string>
+
+    <!-- DESCRIPTION SECTION -->
+    <string name="tv_nothing_selected">Select one Sweet</string>
+
+    <!-- INGREDIENTS FRAGMENT -->
+    <string name="tv_ingredients_title_list">Ingredients</string>
+
+    <!-- STEPS FRAGMENT -->
+    <string name="tv_steps_title_list">Steps</string>
 
 </resources>
