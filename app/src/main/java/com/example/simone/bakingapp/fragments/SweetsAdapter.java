@@ -59,6 +59,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
     implements View.OnClickListener{
         @BindView(R.id.iv_sweet_image) ImageView mSweetImage;
         @BindView(R.id.tv_sweet_name) TextView mSweetName;
+        @BindView(R.id.tv_servings_number) TextView mSweetServings;
         @BindDrawable(R.drawable.ic_no_image) Drawable dNoImage;
         @BindDrawable(R.drawable.bakingapp_icon2) Drawable dNoImageAvailable;
 
@@ -76,6 +77,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
                     .error(dNoImageAvailable)
                     .into(mSweetImage);
             mSweetName.setText(sweet.getName());
+            mSweetServings.setText(Integer.toString(sweet.getServings()));
         }
 
         @Override

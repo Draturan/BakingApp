@@ -35,14 +35,39 @@
 
             <TextView
                 android:id="@+id/tv_sweet_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/card_margin_text_spacing"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="@dimen/card_margin_text_spacing"
                 android:layout_marginTop="@dimen/card_margin_text_spacing"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tv_servings"
                 app:layout_constraintStart_toEndOf="@id/iv_sweet_image"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_servings_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="@dimen/servings_number_text"
+                app:layout_constraintEnd_toStartOf="@+id/tv_servings"
+                app:layout_constraintStart_toEndOf="@+id/tv_servings"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_servings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="2dp"
+                android:text="@string/tv_servings"
+                android:textSize="@dimen/servings_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_servings_number" />
+
+
 
         </android.support.constraint.ConstraintLayout>
 

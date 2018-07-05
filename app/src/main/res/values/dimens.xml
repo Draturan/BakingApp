@@ -5,6 +5,8 @@
     <dimen name="card_margin_spacing">8dp</dimen>
     <dimen name="card_margin_text_spacing">8dp</dimen>
     <dimen name="card_image_dimension">70dp</dimen>
+    <dimen name="servings_number_text">18sp</dimen>
+    <dimen name="servings_text">12sp</dimen>
 
     <!-- DESCRIPTION SECTION -->
     <dimen name="nothing_selected_margin_tv">5dp</dimen>
