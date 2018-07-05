@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     private final VideoStepsClickListener videoStepsClickListener;
 
     public interface VideoStepsClickListener{
-        void onVideoStepClick(Step clickedStep);
+        void onVideoStepClick(Step clickedStep, View view);
     }
 
     public StepsAdapter(@NonNull Context context, @NonNull ArrayList<Step> steps, VideoStepsClickListener listener){
@@ -67,7 +68,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
         public void bind(int position, ArrayList<Step> steps){
             Step step = steps.get(position);
             if (step.getId() == 0){
-                // Found a solution to print an hex symbol in a textView: https://stackoverflow.com/questions/5880338/how-to-have-i-e-and-symbol-in-android-textview
+                // Found solution to print an hex symbol in a textView: https://stackoverflow.com/questions/5880338/how-to-have-i-e-and-symbol-in-android-textview
                 mTVId.setText(Html.fromHtml("&#x2605;"));
             }else {
                 mTVId.setText(String.valueOf(step.getId()));
@@ -80,7 +81,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            videoStepsClickListener.onVideoStepClick(mStepsList.get(position));
+            videoStepsClickListener.onVideoStepClick(mStepsList.get(position), v);
         }
     }
 

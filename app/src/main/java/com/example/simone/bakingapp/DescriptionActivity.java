@@ -45,8 +45,6 @@ public class DescriptionActivity extends AppCompatActivity {
                     .add(R.id.f_steps, mStepsFragment, TAG_STEPS_FRAGMENT)
                     .commit();
 
-
-            Log.d(TAG, mIngredientList.toString());
         }
 
     }
