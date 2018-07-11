@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.simone.bakingapp.R;
@@ -43,6 +44,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class StepsFragment extends Fragment
         implements StepsAdapter.VideoStepsClickListener,
                     Player.EventListener{
@@ -50,10 +54,10 @@ public class StepsFragment extends Fragment
     private static final String TAG = Fragment.class.getName();
     private static final String ARG_STEPS = "steps_arg";
     private static final String LAST_POSITION_RV = "steps.rv.last.position";
-    private Parcelable mSavedRecyclerLayoutState;
     private ArrayList<Step> mStepList;
     private StepsAdapter stepsAdapter;
     @BindView(R.id.rv_steps_list) RecyclerView ListSteps;
+    @BindView(R.id.tv_steps_list_title) TextView mTVTitle;
 
     private ExoPlayer mExoPlayer;
     private PlayerView mPlayerView;
@@ -124,6 +128,11 @@ public class StepsFragment extends Fragment
         mMediaSession.setCallback(new VideoCallbacks());
         mMediaSession.setActive(true);
 
+        if (mStepList == null){
+            noSelectedSweetDisplay(true);
+        }else{
+            noSelectedSweetDisplay(false);
+        }
         // Inflate the layout for this fragment
         return view;
     }
@@ -158,25 +167,24 @@ public class StepsFragment extends Fragment
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null){
-            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
+            Parcelable mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
             ListSteps.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
             if (lastVideoPosition != null){
                 Log.d(TAG + " Step","Last step: " + Integer.toString(lastStepClicked));
                 Log.d(TAG + " Video","Last position: " + lastVideoPosition);
-                //found this solution here: https://stackoverflow.com/questions/42514011/how-to-retain-recyclerviews-position-after-orientation-change-while-using-fire
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-//                        ListSteps.getChildAt(lastStepClicked).callOnClick();
-                    }
-                }, 50);
+                Log.d(TAG + " Step","Item clicked: " + Long.toString(stepsAdapter.getItemId(lastStepClicked)));
+
+//                ListSteps.getChildAt((int) stepsAdapter.getItemId(lastStepClicked)).callOnClick();
             }
         }
     }
 
-    public void updateData(ArrayList<Step> stepsList) {
-        mStepList = stepsList;
-        stepsAdapter.dataUpdate(mStepList);
+    public void noSelectedSweetDisplay(boolean display){
+        if (display){
+            mTVTitle.setVisibility(GONE);
+        }else{
+            mTVTitle.setVisibility(VISIBLE);
+        }
     }
 
     private void stopPlayer(Boolean release){

@@ -1,11 +1,12 @@
 package com.example.simone.bakingapp.fragments;
 
 import android.content.Context;
-import android.net.Uri;
+import android.icu.text.SymbolTable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
+import android.text.Spannable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +29,11 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     private ArrayList<Step> mStepsList;
     private final VideoStepsClickListener videoStepsClickListener;
 
-    public interface VideoStepsClickListener{
+    public interface VideoStepsClickListener {
         void onVideoStepClick(int position, View view);
     }
 
-    public StepsAdapter(@NonNull Context context, @NonNull ArrayList<Step> steps, VideoStepsClickListener listener){
+    StepsAdapter(@NonNull Context context, @NonNull ArrayList<Step> steps, VideoStepsClickListener listener) {
         mContext = context;
         mStepsList = steps;
         videoStepsClickListener = listener;
@@ -51,26 +52,30 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     }
 
     @Override
-    public int getItemCount() { return (mStepsList == null) ? 0 : mStepsList.size(); }
+    public int getItemCount() {
+        return (mStepsList == null) ? 0 : mStepsList.size();
+    }
 
     public class StepsViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener{
-        @BindView(R.id.steps_tv_id) TextView mTVId;
-        @BindView(R.id.steps_tv_short_description) TextView mTVShortDescription;
-        @BindView(R.id.steps_tv_description) TextView mTVDescription;
+            implements View.OnClickListener {
+        @BindView(R.id.steps_tv_id)
+        TextView mTVId;
+        @BindView(R.id.steps_tv_short_description)
+        TextView mTVShortDescription;
+        @BindView(R.id.steps_tv_description)
+        TextView mTVDescription;
 
-        public StepsViewHolder(View itemView) {
+        StepsViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(int position, ArrayList<Step> steps){
+        void bind(int position, ArrayList<Step> steps) {
             Step step = steps.get(position);
-            if (step.getId() == 0){
-                // Found solution to print an hex symbol in a textView: https://stackoverflow.com/questions/5880338/how-to-have-i-e-and-symbol-in-android-textview
-                mTVId.setText(Html.fromHtml("&#x2605;"));
-            }else {
+            if (step.getId() == 0) {
+                mTVId.setText(R.string.tv_steps_zero_symbol);
+            } else {
                 mTVId.setText(String.valueOf(step.getId()));
             }
 
@@ -78,7 +83,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
             mTVDescription.setText(step.getDescription());
         }
 
-        public View getItemView(int position){
+        public View getItemView(int position) {
             //TODO completare
             return null;
         }
@@ -90,11 +95,4 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
 //            videoStepsClickListener.onVideoStepClick(mStepsList.get(position), v);
         }
     }
-
-    public void dataUpdate(ArrayList<Step> newSteps){
-        mStepsList = newSteps;
-        notifyDataSetChanged();
-    }
-
-
 }

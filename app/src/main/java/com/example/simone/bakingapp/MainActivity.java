@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,12 +24,14 @@ import static android.view.View.GONE;
 public class MainActivity extends AppCompatActivity
     implements SweetListMasterFragment.OnSweetClickListener{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String TAG_INGREDIENTS_FRAGMENT = IngredientsFragment.class.getSimpleName();
-    private static final String SAVING_INGREDIENTS = "saveIngredients";
-    private static final String TAG_STEPS_FRAGMENT = StepsFragment.class.getSimpleName();
-    private static final String SAVING_STEPS= "saveSteps";
+    private static final String TAG = MainActivity.class.getName();
+    private static final String TAG_INGREDIENTS_FRAGMENT = IngredientsFragment.class.getName();
+    private static final String SAVE_INGREDIENTS_FRAGMENT = "Instance Ingredients Fragment";
+    private static final String TAG_STEPS_FRAGMENT = StepsFragment.class.getName();
+    private static final String SAVE_STEPS_FRAGMENT = "Instance Steps Fragment";
+    private static final String SAVING_SWEET= "saveSweet";
 
+    private Sweet lastSweet;
     private IngredientsFragment mIngredientsFragment;
     private ArrayList<Ingredient> mIngredientList;
     private StepsFragment mStepsFragment;
@@ -42,53 +45,54 @@ public class MainActivity extends AppCompatActivity
         if (findViewById(R.id.cl_tablet_view) != null){
             mAlignVersion = true;
             if (savedInstanceState != null){
-                mIngredientList = savedInstanceState.getParcelableArrayList(SAVING_INGREDIENTS);
-                mStepsList = savedInstanceState.getParcelableArrayList(SAVING_STEPS);
+                mIngredientsFragment = (IngredientsFragment) getSupportFragmentManager().getFragment(savedInstanceState, SAVE_INGREDIENTS_FRAGMENT);
+                mStepsFragment = (StepsFragment) getSupportFragmentManager().getFragment(savedInstanceState, SAVE_STEPS_FRAGMENT);
+                lastSweet = savedInstanceState.getParcelable(SAVING_SWEET);
+                if (lastSweet != null){
+                    mIngredientList = lastSweet.getIngredients();
+                    mStepsList = lastSweet.getSteps();
+                }
             }
-            mIngredientsFragment = (IngredientsFragment) getSupportFragmentManager().findFragmentByTag(TAG_INGREDIENTS_FRAGMENT);
-            mStepsFragment = (StepsFragment) getSupportFragmentManager().findFragmentByTag(TAG_STEPS_FRAGMENT);
-            if ((mIngredientsFragment == null) || (mStepsFragment == null)){
+
+            if ((mIngredientsFragment == null) && (mStepsFragment == null)){
                 mIngredientsFragment = IngredientsFragment.newInstance(mIngredientList);
                 mStepsFragment = StepsFragment.newInstance(mStepsList);
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(R.id.f_ingredients, mIngredientsFragment, TAG_INGREDIENTS_FRAGMENT)
                         .add(R.id.f_steps, mStepsFragment, TAG_STEPS_FRAGMENT)
                         .commit();
-            }
-
-            if (mIngredientList == null){
                 noSelectedSweetDisplay(true);
-            }else {
+            }else{
                 noSelectedSweetDisplay(false);
             }
         }else {
             mAlignVersion = false;
         }
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mAlignVersion){
-            outState.putParcelableArrayList(SAVING_INGREDIENTS, mIngredientList);
-            outState.putParcelableArrayList(SAVING_STEPS, mStepsList);
+            getSupportFragmentManager().putFragment(outState, SAVE_INGREDIENTS_FRAGMENT, getSupportFragmentManager().findFragmentByTag(TAG_INGREDIENTS_FRAGMENT));
+            getSupportFragmentManager().putFragment(outState, SAVE_STEPS_FRAGMENT, getSupportFragmentManager().findFragmentByTag(TAG_STEPS_FRAGMENT));
+            outState.putParcelable(SAVING_SWEET, lastSweet);
         }
 
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
     public void onSweetSelected(Sweet sweetClicked) {
         if (mAlignVersion){
-            mIngredientList = sweetClicked.getIngredients();
-            mStepsList = sweetClicked.getSteps();
-            mIngredientsFragment.updateData(mIngredientList);
-            mStepsFragment.updateData(mStepsList);
+            lastSweet = sweetClicked;
+            mIngredientList = lastSweet.getIngredients();
+            mStepsList = lastSweet.getSteps();
+            mIngredientsFragment = IngredientsFragment.newInstance(mIngredientList);
+            mStepsFragment = StepsFragment.newInstance(mStepsList);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.f_ingredients, mIngredientsFragment, TAG_INGREDIENTS_FRAGMENT)
+                    .replace(R.id.f_steps, mStepsFragment, TAG_STEPS_FRAGMENT)
+                    .commit();
             noSelectedSweetDisplay(false);
         }else {
             Intent startDescriptionActivityIntent = new Intent(this, DescriptionActivity.class);
@@ -102,6 +106,7 @@ public class MainActivity extends AppCompatActivity
         if (mAlignVersion){
             ImageView mNoSelectedImageView = findViewById(R.id.iv_sweet_no_selection);
             TextView mNoSelectedTextView = findViewById(R.id.tv_sweet_no_selection);
+
             if (display){
                 mNoSelectedImageView.setVisibility(View.VISIBLE);
                 mNoSelectedTextView.setVisibility(View.VISIBLE);

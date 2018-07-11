@@ -67,8 +67,4 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
         }
     }
 
-    public void updateData(ArrayList<Ingredient> newIngredients){
-        mIngredientsList = newIngredients;
-        notifyDataSetChanged();
-    }
 }

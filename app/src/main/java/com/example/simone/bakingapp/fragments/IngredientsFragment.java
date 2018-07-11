@@ -1,8 +1,6 @@
 package com.example.simone.bakingapp.fragments;
 
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.model.Ingredient;
@@ -21,13 +20,17 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class IngredientsFragment extends Fragment {
 
-    public static final String TAG = IngredientsFragment.class.getSimpleName();
+    public static final String TAG = IngredientsFragment.class.getName();
     private static final String ARG_INGREDIENTS = "ingredients_arg";
     private static final String LAST_POSITION_RV = "last.ingredient.rv.position";
     private Parcelable mSavedRecyclerLayoutState;
 
+    @BindView(R.id.tv_ingredients_list_title) TextView mTVTitle;
     @BindView(R.id.rv_ingredients_list) RecyclerView ListIngredients;
     private ArrayList<Ingredient> mIngredients;
     private IngredientsAdapter ingredientsAdapter;
@@ -73,6 +76,11 @@ public class IngredientsFragment extends Fragment {
         ingredientsAdapter = new IngredientsAdapter(getContext(), mIngredients);
         ListIngredients.setAdapter(ingredientsAdapter);
 
+        if (mIngredients == null){
+            noSelectedSweetDisplay(true);
+        }else {
+            noSelectedSweetDisplay(false);
+        }
         // Inflate the layout for this fragment
         return view;
     }
@@ -92,9 +100,13 @@ public class IngredientsFragment extends Fragment {
         }
     }
 
-    public void updateData(ArrayList<Ingredient> ingredientArrayList){
-        mIngredients = ingredientArrayList;
-        ingredientsAdapter.updateData(mIngredients);
+
+    public void noSelectedSweetDisplay(boolean display){
+        if (display){
+            mTVTitle.setVisibility(GONE);
+        }else{
+            mTVTitle.setVisibility(VISIBLE);
+        }
     }
 
 }

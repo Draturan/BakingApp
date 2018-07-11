@@ -18,5 +18,7 @@
 
     <!-- STEPS FRAGMENT -->
     <string name="tv_steps_title_list">Steps</string>
+    <string name="tv_steps_zero_symbol">&#x2605;</string>
+
 
 </resources>
