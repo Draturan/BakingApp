@@ -2,6 +2,7 @@ package com.example.simone.bakingapp.fragments;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -46,7 +47,7 @@ public class StepsFragment extends Fragment
         implements StepsAdapter.VideoStepsClickListener,
                     Player.EventListener{
 
-    private static final String TAG = Fragment.class.getSimpleName();
+    private static final String TAG = Fragment.class.getName();
     private static final String ARG_STEPS = "steps_arg";
     private static final String LAST_POSITION_RV = "steps.rv.last.position";
     private Parcelable mSavedRecyclerLayoutState;
@@ -62,7 +63,7 @@ public class StepsFragment extends Fragment
     private boolean isPlaying = false;
     private Long lastVideoPosition;
     private static final String LAST_STEP_CLICKED = "last step clicked";
-    private Step lastStepClicked;
+    private int lastStepClicked;
 
     public StepsFragment() {
         // Required empty public constructor
@@ -97,7 +98,8 @@ public class StepsFragment extends Fragment
         ButterKnife.bind(this, view);
 
         if (savedInstanceState != null){
-            Log.d(TAG + "StepFragment linea 98","Last position: " + lastVideoPosition);
+            lastStepClicked = savedInstanceState.getInt(LAST_STEP_CLICKED);
+            lastVideoPosition = savedInstanceState.getLong(CURRENT_VIDEO_POSITION);
         }
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
@@ -121,6 +123,7 @@ public class StepsFragment extends Fragment
         mMediaSession.setPlaybackState(mStateBuilder.build());
         mMediaSession.setCallback(new VideoCallbacks());
         mMediaSession.setActive(true);
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -146,9 +149,8 @@ public class StepsFragment extends Fragment
         if (isPlaying){
             stopPlayer(false);
             outState.putLong(CURRENT_VIDEO_POSITION, lastVideoPosition);
-            Log.d("SALVIAMO L'OROLOGIO!", Long.toString(lastVideoPosition));
         }
-        outState.putParcelable(LAST_STEP_CLICKED, lastStepClicked);
+        outState.putInt(LAST_STEP_CLICKED, lastStepClicked);
         outState.putParcelable(LAST_POSITION_RV, ListSteps.getLayoutManager().onSaveInstanceState());
     }
 
@@ -156,10 +158,19 @@ public class StepsFragment extends Fragment
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null){
-            lastVideoPosition = savedInstanceState.getLong(CURRENT_VIDEO_POSITION);
-            lastStepClicked = savedInstanceState.getParcelable(LAST_STEP_CLICKED);
             mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
             ListSteps.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+            if (lastVideoPosition != null){
+                Log.d(TAG + " Step","Last step: " + Integer.toString(lastStepClicked));
+                Log.d(TAG + " Video","Last position: " + lastVideoPosition);
+                //found this solution here: https://stackoverflow.com/questions/42514011/how-to-retain-recyclerviews-position-after-orientation-change-while-using-fire
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+//                        ListSteps.getChildAt(lastStepClicked).callOnClick();
+                    }
+                }, 50);
+            }
         }
     }
 
@@ -203,15 +214,15 @@ public class StepsFragment extends Fragment
     }
 
     @Override
-    public void onVideoStepClick(Step clickedStep, View view) {
+    public void onVideoStepClick(int position, View view) {
         // In case a player was already in use stop it and start with a new session on the new step clicked
         if (mExoPlayer != null){
             mExoPlayer = null;
             mPlayerView.setPlayer(null);
         }
-        lastStepClicked = clickedStep;
+        lastStepClicked = position;
 
-        initializePlayer(clickedStep, view);
+        initializePlayer(mStepList.get(position), view);
     }
 
     public void initializePlayer(@Nullable Step clickedStep, View view){

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity
                 mIngredientList = savedInstanceState.getParcelableArrayList(SAVING_INGREDIENTS);
                 mStepsList = savedInstanceState.getParcelableArrayList(SAVING_STEPS);
             }
-
             mIngredientsFragment = (IngredientsFragment) getSupportFragmentManager().findFragmentByTag(TAG_INGREDIENTS_FRAGMENT);
             mStepsFragment = (StepsFragment) getSupportFragmentManager().findFragmentByTag(TAG_STEPS_FRAGMENT);
             if ((mIngredientsFragment == null) || (mStepsFragment == null)){
@@ -55,9 +54,6 @@ public class MainActivity extends AppCompatActivity
                 fragmentTransaction.add(R.id.f_ingredients, mIngredientsFragment, TAG_INGREDIENTS_FRAGMENT)
                         .add(R.id.f_steps, mStepsFragment, TAG_STEPS_FRAGMENT)
                         .commit();
-            }else{
-                mIngredientsFragment.updateData(mIngredientList);
-                mStepsFragment.updateData(mStepsList);
             }
 
             if (mIngredientList == null){

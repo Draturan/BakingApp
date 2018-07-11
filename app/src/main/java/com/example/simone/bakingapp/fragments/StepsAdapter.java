@@ -29,7 +29,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     private final VideoStepsClickListener videoStepsClickListener;
 
     public interface VideoStepsClickListener{
-        void onVideoStepClick(Step clickedStep, View view);
+        void onVideoStepClick(int position, View view);
     }
 
     public StepsAdapter(@NonNull Context context, @NonNull ArrayList<Step> steps, VideoStepsClickListener listener){
@@ -78,10 +78,16 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
             mTVDescription.setText(step.getDescription());
         }
 
+        public View getItemView(int position){
+            //TODO completare
+            return null;
+        }
+
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            videoStepsClickListener.onVideoStepClick(mStepsList.get(position), v);
+            videoStepsClickListener.onVideoStepClick(position, v);
+//            videoStepsClickListener.onVideoStepClick(mStepsList.get(position), v);
         }
     }
 
@@ -89,5 +95,6 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
         mStepsList = newSteps;
         notifyDataSetChanged();
     }
+
 
 }
