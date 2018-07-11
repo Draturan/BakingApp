@@ -3,6 +3,7 @@ package com.example.simone.bakingapp.fragments;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
     private final ListSweetClickListener mOnClickListener;
 
     public interface ListSweetClickListener{
-        void onListSweetClick (Sweet sweetClicked);
+        void onListSweetClick (Sweet sweetClicked, int clickedPosition);
     }
 
     public SweetsAdapter(@NonNull Context mContext, @NonNull ArrayList<Sweet> sweetArrayList, ListSweetClickListener mOnClickListener) {
@@ -60,6 +61,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
         @BindView(R.id.iv_sweet_image) ImageView mSweetImage;
         @BindView(R.id.tv_sweet_name) TextView mSweetName;
         @BindView(R.id.tv_servings_number) TextView mSweetServings;
+        @BindView(R.id.cv_sweet) CardView mCardView;
         @BindDrawable(R.drawable.ic_no_image) Drawable dNoImage;
         @BindDrawable(R.drawable.bakingapp_icon2) Drawable dNoImageAvailable;
 
@@ -78,12 +80,14 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
                     .into(mSweetImage);
             mSweetName.setText(sweet.getName());
             mSweetServings.setText(Integer.toString(sweet.getServings()));
+
         }
 
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListSweetClick(mSweetList.get(clickedPosition));
+            mOnClickListener.onListSweetClick(mSweetList.get(clickedPosition), clickedPosition);
+            mCardView.setCardBackgroundColor(mContext.getResources().getColor(R.color.selectedSweet,null));
         }
     }
 

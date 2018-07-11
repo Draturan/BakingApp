@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cv_sweet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/card_margin_spacing"
@@ -26,8 +27,8 @@
                 android:layout_width="@dimen/card_image_dimension"
                 android:layout_height="@dimen/card_image_dimension"
                 android:adjustViewBounds="false"
-                android:cropToPadding="false"
                 android:contentDescription="@string/iv_sweet_description"
+                android:cropToPadding="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -66,7 +67,6 @@
                 android:textSize="@dimen/servings_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_servings_number" />
-
 
 
         </android.support.constraint.ConstraintLayout>

@@ -1,23 +1,21 @@
 package com.example.simone.bakingapp.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.async.AsyncTaskCompleteListener;
@@ -48,11 +46,14 @@ public class SweetListMasterFragment extends Fragment
 
     private SweetsAdapter sweetsAdapter;
     private ArrayList<Sweet> mSweetList;
+    private static final String SWEET_LIST = "sweet list";
+    public static final String ARG_SWEETS = "sweets_arg";
 
     private static final String LAST_POSITION_RV = "last.recycler.layout";
     private Parcelable mSavedRecyclerLayoutState;
     public OnSweetClickListener mListener;
-
+    private static final String LAST_SWEET_CLICKED = "last.sweet.clicked";
+    private Integer lastSweetClicked;
 
     public SweetListMasterFragment() {
         // Required empty public constructor
@@ -64,9 +65,12 @@ public class SweetListMasterFragment extends Fragment
      *
      * @return A new instance of fragment SweetListMasterFragment.
      */
-    public static SweetListMasterFragment newInstance() {
+    public static SweetListMasterFragment newInstance(@Nullable ArrayList<Sweet> sweets) {
         SweetListMasterFragment fragment = new SweetListMasterFragment();
         Bundle args = new Bundle();
+        if (sweets != null){
+            args.putParcelableArrayList(ARG_SWEETS, sweets);
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,12 +79,16 @@ public class SweetListMasterFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            mSweetList = getArguments().getParcelableArrayList(ARG_SWEETS);
         }
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_sweet_list_master, container, false);
         ButterKnife.bind(this, view);
 
@@ -88,10 +96,15 @@ public class SweetListMasterFragment extends Fragment
         sweetList.setLayoutManager(linearLayoutManager);
         sweetList.setHasFixedSize(true);
 
-        startRetrievingSweetsInfo();
+        if (savedInstanceState != null){
+            mSweetList = savedInstanceState.getParcelableArrayList(SWEET_LIST);
+        }else{
+            startRetrievingSweetsInfo();
+        }
 
         sweetsAdapter = new SweetsAdapter(getContext(), mSweetList, this);
         sweetList.setAdapter(sweetsAdapter);
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -99,17 +112,31 @@ public class SweetListMasterFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(SWEET_LIST, mSweetList);
         outState.putParcelable(LAST_POSITION_RV, sweetList.getLayoutManager().onSaveInstanceState());
+        outState.putInt(LAST_SWEET_CLICKED, lastSweetClicked);
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null){
-            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
-            sweetList.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+            //found this solution here: https://stackoverflow.com/questions/42514011/how-to-retain-recyclerviews-position-after-orientation-change-while-using-fire
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
+                    sweetList.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+                    mSweetList = savedInstanceState.getParcelableArrayList(SWEET_LIST);
+                    lastSweetClicked = savedInstanceState.getInt(LAST_SWEET_CLICKED);
+                    sweetList.getLayoutManager().getChildAt(lastSweetClicked)
+                            .findViewById(R.id.cv_sweet)
+                            .setBackgroundColor(getResources().getColor(R.color.selectedSweet, null));
+                }
+            }, 50);
         }
     }
+
 
     public interface OnSweetClickListener{
         void onSweetSelected(Sweet sweetClicked);
@@ -133,9 +160,22 @@ public class SweetListMasterFragment extends Fragment
     }
 
     @Override
-    public void onListSweetClick(Sweet sweetClicked) {
+    public void onListSweetClick(Sweet sweetClicked, int position) {
         if (mListener != null) {
             mListener.onSweetSelected(sweetClicked);
+            if (lastSweetClicked != null){
+                sweetList.getChildAt(lastSweetClicked)
+                        .findViewById(R.id.cv_sweet)
+                        .setBackgroundColor(
+                                getResources().getColor(R.color.white, null)
+                        );
+            }
+            lastSweetClicked = position;
+            sweetList.getChildAt(position)
+                    .findViewById(R.id.cv_sweet)
+                    .setBackgroundColor(
+                            getResources().getColor(R.color.selectedSweet, null)
+                    );
         }
     }
 

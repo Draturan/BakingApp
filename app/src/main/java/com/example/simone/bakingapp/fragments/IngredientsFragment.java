@@ -2,6 +2,8 @@ package com.example.simone.bakingapp.fragments;
 
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +24,9 @@ import butterknife.ButterKnife;
 public class IngredientsFragment extends Fragment {
 
     public static final String TAG = IngredientsFragment.class.getSimpleName();
-    public static final String ARG_INGREDIENTS = "ingredients";
+    private static final String ARG_INGREDIENTS = "ingredients_arg";
+    private static final String LAST_POSITION_RV = "last.ingredient.rv.position";
+    private Parcelable mSavedRecyclerLayoutState;
 
     @BindView(R.id.rv_ingredients_list) RecyclerView ListIngredients;
     private ArrayList<Ingredient> mIngredients;
@@ -71,6 +75,21 @@ public class IngredientsFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LAST_POSITION_RV, ListIngredients.getLayoutManager().onSaveInstanceState());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null){
+            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
+            ListIngredients.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+        }
     }
 
     public void updateData(ArrayList<Ingredient> ingredientArrayList){

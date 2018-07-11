@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#c67e32</color>
     <color name="colorAccent">#a3141c</color>
 
+    <color name="white">#ffffff</color>
     <color name="textError">#7c7c7c7c</color>
+    <color name="selectedSweet">#FF8FA5B2</color>
 </resources>

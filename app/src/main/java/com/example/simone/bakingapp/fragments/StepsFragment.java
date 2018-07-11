@@ -2,12 +2,14 @@ package com.example.simone.bakingapp.fragments;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +47,9 @@ public class StepsFragment extends Fragment
                     Player.EventListener{
 
     private static final String TAG = Fragment.class.getSimpleName();
-    private static final String ARG_STEPS = "steps";
+    private static final String ARG_STEPS = "steps_arg";
+    private static final String LAST_POSITION_RV = "steps.rv.last.position";
+    private Parcelable mSavedRecyclerLayoutState;
     private ArrayList<Step> mStepList;
     private StepsAdapter stepsAdapter;
     @BindView(R.id.rv_steps_list) RecyclerView ListSteps;
@@ -54,6 +58,11 @@ public class StepsFragment extends Fragment
     private PlayerView mPlayerView;
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
+    private static final String CURRENT_VIDEO_POSITION = "last video position";
+    private boolean isPlaying = false;
+    private Long lastVideoPosition;
+    private static final String LAST_STEP_CLICKED = "last step clicked";
+    private Step lastStepClicked;
 
     public StepsFragment() {
         // Required empty public constructor
@@ -87,6 +96,10 @@ public class StepsFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_steps, container, false);
         ButterKnife.bind(this, view);
 
+        if (savedInstanceState != null){
+            Log.d(TAG + "StepFragment linea 98","Last position: " + lastVideoPosition);
+        }
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         ListSteps.setLayoutManager(linearLayoutManager);
         ListSteps.setHasFixedSize(true);
@@ -112,10 +125,10 @@ public class StepsFragment extends Fragment
         return view;
     }
 
-    private void releasePlayer(){
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopPlayer(false);
     }
 
     @Override
@@ -123,7 +136,31 @@ public class StepsFragment extends Fragment
         super.onDestroy();
         //free resources used for the player
         mMediaSession.setActive(false);
-        releasePlayer();
+        stopPlayer(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Looking if the video is using and decide if save the last instance state or not
+        if (isPlaying){
+            stopPlayer(false);
+            outState.putLong(CURRENT_VIDEO_POSITION, lastVideoPosition);
+            Log.d("SALVIAMO L'OROLOGIO!", Long.toString(lastVideoPosition));
+        }
+        outState.putParcelable(LAST_STEP_CLICKED, lastStepClicked);
+        outState.putParcelable(LAST_POSITION_RV, ListSteps.getLayoutManager().onSaveInstanceState());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null){
+            lastVideoPosition = savedInstanceState.getLong(CURRENT_VIDEO_POSITION);
+            lastStepClicked = savedInstanceState.getParcelable(LAST_STEP_CLICKED);
+            mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
+            ListSteps.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+        }
     }
 
     public void updateData(ArrayList<Step> stepsList) {
@@ -131,17 +168,31 @@ public class StepsFragment extends Fragment
         stepsAdapter.dataUpdate(mStepList);
     }
 
+    private void stopPlayer(Boolean release){
+        if (mExoPlayer != null){
+            lastVideoPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayer.stop();
+            if (release){
+                mExoPlayer.release();
+                mExoPlayer = null;
+            }
+        }
+    }
+
     private class VideoCallbacks extends MediaSessionCompat.Callback{
         @Override
         public void onPlay() {
             super.onPlay();
-            mExoPlayer.setPlayWhenReady(true);
+            isPlaying = true;
+            mExoPlayer.setPlayWhenReady(isPlaying);
         }
 
         @Override
         public void onPause() {
             super.onPause();
-            mExoPlayer.setPlayWhenReady(false);
+            isPlaying = false;
+            lastVideoPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayer.setPlayWhenReady(isPlaying);
         }
 
         @Override
@@ -158,13 +209,12 @@ public class StepsFragment extends Fragment
             mExoPlayer = null;
             mPlayerView.setPlayer(null);
         }
-        initializePlayer();
-        mPlayerView = view.findViewById(R.id.steps_frame_video);
-        mPlayerView.setPlayer(mExoPlayer);
-        preparePlayer(Uri.parse(clickedStep.getVideoURL()));
+        lastStepClicked = clickedStep;
+
+        initializePlayer(clickedStep, view);
     }
 
-    public void initializePlayer(){
+    public void initializePlayer(@Nullable Step clickedStep, View view){
         if (mExoPlayer == null){
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             TrackSelection.Factory videoTrackSelectionFactory =
@@ -174,7 +224,15 @@ public class StepsFragment extends Fragment
 
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
             mExoPlayer.addListener(this);
+        }
+        if (lastVideoPosition != null){
+            mExoPlayer.seekTo(lastVideoPosition);
+        }
+        mPlayerView = view.findViewById(R.id.steps_frame_video);
 
+        mPlayerView.setPlayer(mExoPlayer);
+        if (clickedStep != null){
+            preparePlayer(Uri.parse(clickedStep.getVideoURL()));
         }
     }
 
@@ -192,7 +250,6 @@ public class StepsFragment extends Fragment
         mExoPlayer.prepare(videoSource);
     }
 
-    // Implementation of the Player Listener
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
 
@@ -208,14 +265,17 @@ public class StepsFragment extends Fragment
 
     }
 
+    // Implementation of the Player Listener
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if ((playbackState == Player.STATE_READY) && playWhenReady){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
+            isPlaying = true;
         }else if (playbackState == Player.STATE_READY){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
+            isPlaying = false;
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
 
@@ -233,7 +293,7 @@ public class StepsFragment extends Fragment
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        Toast.makeText(getContext(), "Video no available",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Video not available",Toast.LENGTH_SHORT).show();
     }
 
     @Override
