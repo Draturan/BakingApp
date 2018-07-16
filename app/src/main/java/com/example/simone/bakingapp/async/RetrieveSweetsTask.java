@@ -7,7 +7,6 @@ import com.example.simone.bakingapp.utils.NetworkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,16 +15,11 @@ import java.net.URL;
  * Created by Simone on 20/06/2018 for BakingApp project
  */
 public class RetrieveSweetsTask extends AsyncTask<URL, Void, String>{
-
-    private static final String TAG = RetrieveSweetsTask.class.toString();
-
-    private Context context;
     private AsyncTaskCompleteListener<String> listener;
 
     private static final String SWEETS_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
-    public RetrieveSweetsTask(Context ctx, AsyncTaskCompleteListener<String> listener){
-        this.context = ctx;
+    public RetrieveSweetsTask(AsyncTaskCompleteListener<String> listener){
         this.listener = listener;
     }
 

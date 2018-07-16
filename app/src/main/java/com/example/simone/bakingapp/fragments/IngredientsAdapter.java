@@ -12,10 +12,8 @@ import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.model.Ingredient;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 /**

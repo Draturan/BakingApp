@@ -35,7 +35,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
         void onListSweetClick (Sweet sweetClicked, int clickedPosition);
     }
 
-    public SweetsAdapter(@NonNull Context mContext, @NonNull ArrayList<Sweet> sweetArrayList, ListSweetClickListener mOnClickListener) {
+    SweetsAdapter(@NonNull Context mContext, @NonNull ArrayList<Sweet> sweetArrayList, ListSweetClickListener mOnClickListener) {
         this.mContext = mContext;
         this.mSweetList = sweetArrayList;
         this.mOnClickListener = mOnClickListener;
@@ -65,13 +65,13 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
         @BindDrawable(R.drawable.ic_no_image) Drawable dNoImage;
         @BindDrawable(R.drawable.bakingapp_icon2) Drawable dNoImageAvailable;
 
-        public SweetViewHolder(View itemView) {
+        SweetViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(int position, ArrayList<Sweet> mSweetList){
+        void bind(int position, ArrayList<Sweet> mSweetList){
             Sweet sweet = mSweetList.get(position);
             Picasso.with(mContext)
                     .load(NetworkUtils.buildImageUrl(sweet.getImage()))
@@ -79,7 +79,7 @@ public class SweetsAdapter extends RecyclerView.Adapter<SweetsAdapter.SweetViewH
                     .error(dNoImageAvailable)
                     .into(mSweetImage);
             mSweetName.setText(sweet.getName());
-            mSweetServings.setText(Integer.toString(sweet.getServings()));
+            mSweetServings.setText(String.valueOf(sweet.getServings()));
 
         }
 

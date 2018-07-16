@@ -20,5 +20,9 @@
     <string name="tv_steps_title_list">Steps</string>
     <string name="tv_steps_zero_symbol">&#x2605;</string>
 
+    <!-- WIDGET -->
+    <string name="appwidget_text">EMPTY SWEET INGREDIENT LIST</string>
+    <string name="add_widget">Add widget</string>
+
 
 </resources>

@@ -10,7 +10,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class StepsFragment extends Fragment
     private static final String LAST_POSITION_RV = "steps.rv.last.position";
     private ArrayList<Step> mStepList;
     private StepsAdapter stepsAdapter;
-    @BindView(R.id.rv_steps_list) RecyclerView ListSteps;
+    @BindView(R.id.rv_steps_list) RecyclerView listSteps;
     @BindView(R.id.tv_steps_list_title) TextView mTVTitle;
 
     private ExoPlayer mExoPlayer;
@@ -107,11 +106,12 @@ public class StepsFragment extends Fragment
         }
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        ListSteps.setLayoutManager(linearLayoutManager);
-        ListSteps.setHasFixedSize(true);
+        listSteps.setLayoutManager(linearLayoutManager);
+        listSteps.setHasFixedSize(true);
+        listSteps.setItemViewCacheSize(10);
 
         stepsAdapter = new StepsAdapter(getContext(), mStepList, this);
-        ListSteps.setAdapter(stepsAdapter);
+        listSteps.setAdapter(stepsAdapter);
 
         // setting up MediaSession
         mMediaSession = new MediaSessionCompat(getContext(), TAG);
@@ -133,22 +133,9 @@ public class StepsFragment extends Fragment
         }else{
             noSelectedSweetDisplay(false);
         }
+
         // Inflate the layout for this fragment
         return view;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        stopPlayer(false);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //free resources used for the player
-        mMediaSession.setActive(false);
-        stopPlayer(true);
     }
 
     @Override
@@ -160,7 +147,7 @@ public class StepsFragment extends Fragment
             outState.putLong(CURRENT_VIDEO_POSITION, lastVideoPosition);
         }
         outState.putInt(LAST_STEP_CLICKED, lastStepClicked);
-        outState.putParcelable(LAST_POSITION_RV, ListSteps.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(LAST_POSITION_RV, listSteps.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
@@ -168,14 +155,68 @@ public class StepsFragment extends Fragment
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null){
             Parcelable mSavedRecyclerLayoutState = savedInstanceState.getParcelable(LAST_POSITION_RV);
-            ListSteps.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
+            listSteps.getLayoutManager().onRestoreInstanceState(mSavedRecyclerLayoutState);
             if (lastVideoPosition != null){
-                Log.d(TAG + " Step","Last step: " + Integer.toString(lastStepClicked));
-                Log.d(TAG + " Video","Last position: " + lastVideoPosition);
-                Log.d(TAG + " Step","Item clicked: " + Long.toString(stepsAdapter.getItemId(lastStepClicked)));
-
-//                ListSteps.getChildAt((int) stepsAdapter.getItemId(lastStepClicked)).callOnClick();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Step lastStep = mStepList.get(lastStepClicked);
+                        initializePlayer(lastStep, listSteps.findViewWithTag(lastStep.getId()));
+                    }
+                }, 50);
             }
+        }
+    }
+
+    @Override
+    public void onVideoStepClick(int position, View view) {
+        // In case a player was already in use stop it and start with a new session on the new step clicked
+        if (mExoPlayer != null){
+            stopPlayer(true);
+            mPlayerView.setPlayer(null);
+        }
+        lastStepClicked = position;
+
+        Step step = mStepList.get(position);
+
+        initializePlayer(step, view);
+    }
+
+    public void initializePlayer(Step clickedStep, View view){
+        if (mExoPlayer == null){
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            DefaultTrackSelector trackSelector =
+                    new DefaultTrackSelector(videoTrackSelectionFactory);
+
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
+            mExoPlayer.addListener(this);
+        }
+
+        mPlayerView =  view.findViewWithTag("video" + Integer.toString(clickedStep.getId()));
+
+        mPlayerView.setPlayer(mExoPlayer);
+
+        preparePlayer(Uri.parse(clickedStep.getVideoURL()));
+    }
+
+    public void preparePlayer(Uri mediaUri){
+        // directly from the Exoplayer developer guide https://google.github.io/ExoPlayer/guide.html
+        // Measures bandwidth during playback. Can be null if not required.
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        // Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
+                Util.getUserAgent(getContext(), getContext().getApplicationInfo().name), bandwidthMeter);
+        // This is the MediaSource representing the media to be played.
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaUri);
+        // Prepare the player with the source.
+
+        mExoPlayer.prepare(videoSource);
+        mExoPlayer.setPlayWhenReady(true);
+        if (lastVideoPosition != null){
+            mExoPlayer.seekTo(lastVideoPosition);
         }
     }
 
@@ -194,6 +235,7 @@ public class StepsFragment extends Fragment
             if (release){
                 mExoPlayer.release();
                 mExoPlayer = null;
+                lastVideoPosition = null;
             }
         }
     }
@@ -203,7 +245,7 @@ public class StepsFragment extends Fragment
         public void onPlay() {
             super.onPlay();
             isPlaying = true;
-            mExoPlayer.setPlayWhenReady(isPlaying);
+            mExoPlayer.setPlayWhenReady(true);
         }
 
         @Override
@@ -211,7 +253,7 @@ public class StepsFragment extends Fragment
             super.onPause();
             isPlaying = false;
             lastVideoPosition = mExoPlayer.getCurrentPosition();
-            mExoPlayer.setPlayWhenReady(isPlaying);
+            mExoPlayer.setPlayWhenReady(false);
         }
 
         @Override
@@ -221,53 +263,7 @@ public class StepsFragment extends Fragment
         }
     }
 
-    @Override
-    public void onVideoStepClick(int position, View view) {
-        // In case a player was already in use stop it and start with a new session on the new step clicked
-        if (mExoPlayer != null){
-            mExoPlayer = null;
-            mPlayerView.setPlayer(null);
-        }
-        lastStepClicked = position;
 
-        initializePlayer(mStepList.get(position), view);
-    }
-
-    public void initializePlayer(@Nullable Step clickedStep, View view){
-        if (mExoPlayer == null){
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelection.Factory videoTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            DefaultTrackSelector trackSelector =
-                    new DefaultTrackSelector(videoTrackSelectionFactory);
-
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
-            mExoPlayer.addListener(this);
-        }
-        if (lastVideoPosition != null){
-            mExoPlayer.seekTo(lastVideoPosition);
-        }
-        mPlayerView = view.findViewById(R.id.steps_frame_video);
-
-        mPlayerView.setPlayer(mExoPlayer);
-        if (clickedStep != null){
-            preparePlayer(Uri.parse(clickedStep.getVideoURL()));
-        }
-    }
-
-    public void preparePlayer(Uri mediaUri){
-        // Measures bandwidth during playback. Can be null if not required.
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
-                Util.getUserAgent(getContext(), getContext().getApplicationInfo().name), bandwidthMeter);
-        // This is the MediaSource representing the media to be played.
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mediaUri);
-        // Prepare the player with the source.
-        mExoPlayer.setPlayWhenReady(true);
-        mExoPlayer.prepare(videoSource);
-    }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {

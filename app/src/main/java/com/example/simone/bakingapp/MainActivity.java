@@ -1,11 +1,9 @@
 package com.example.simone.bakingapp;
 
 import android.content.Intent;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +22,6 @@ import static android.view.View.GONE;
 public class MainActivity extends AppCompatActivity
     implements SweetListMasterFragment.OnSweetClickListener{
 
-    private static final String TAG = MainActivity.class.getName();
     private static final String TAG_INGREDIENTS_FRAGMENT = IngredientsFragment.class.getName();
     private static final String SAVE_INGREDIENTS_FRAGMENT = "Instance Ingredients Fragment";
     private static final String TAG_STEPS_FRAGMENT = StepsFragment.class.getName();

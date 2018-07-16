@@ -1,12 +1,8 @@
 package com.example.simone.bakingapp.fragments;
 
 import android.content.Context;
-import android.icu.text.SymbolTable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.simone.bakingapp.R;
 import com.example.simone.bakingapp.model.Step;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.util.ArrayList;
 
@@ -57,13 +54,11 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
     }
 
     public class StepsViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
-        @BindView(R.id.steps_tv_id)
-        TextView mTVId;
-        @BindView(R.id.steps_tv_short_description)
-        TextView mTVShortDescription;
-        @BindView(R.id.steps_tv_description)
-        TextView mTVDescription;
+            implements View.OnClickListener{
+        @BindView(R.id.steps_tv_id) TextView mTVId;
+        @BindView(R.id.steps_tv_short_description) TextView mTVShortDescription;
+        @BindView(R.id.steps_tv_description) TextView mTVDescription;
+        @BindView(R.id.steps_frame_video) PlayerView mPlayerView;
 
         StepsViewHolder(View itemView) {
             super(itemView);
@@ -78,21 +73,20 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
             } else {
                 mTVId.setText(String.valueOf(step.getId()));
             }
-
+            itemView.setTag(step.getId());
+            mPlayerView.setTag("video" + Integer.toString(step.getId()));
             mTVShortDescription.setText(step.getShortDescription());
             mTVDescription.setText(step.getDescription());
         }
 
-        public View getItemView(int position) {
-            //TODO completare
-            return null;
-        }
+
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getLayoutPosition();
             videoStepsClickListener.onVideoStepClick(position, v);
-//            videoStepsClickListener.onVideoStepClick(mStepsList.get(position), v);
         }
+
     }
+
 }

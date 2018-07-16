@@ -1,7 +1,6 @@
 package com.example.simone.bakingapp.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -9,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +112,9 @@ public class SweetListMasterFragment extends Fragment
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(SWEET_LIST, mSweetList);
         outState.putParcelable(LAST_POSITION_RV, sweetList.getLayoutManager().onSaveInstanceState());
-        outState.putInt(LAST_SWEET_CLICKED, lastSweetClicked);
+        if (lastSweetClicked != null){
+            outState.putInt(LAST_SWEET_CLICKED, lastSweetClicked);
+        }
     }
 
     @Override
@@ -182,7 +182,7 @@ public class SweetListMasterFragment extends Fragment
 
     public void startRetrievingSweetsInfo(){
         if (NetworkUtils.isNetworkAvailable(getContext())){
-            new RetrieveSweetsTask(getContext(), new AsyncTaskCompleteListener<String>() {
+            new RetrieveSweetsTask(new AsyncTaskCompleteListener<String>() {
                 @Override
                 public void onPreTaskExecute() {
                     mProgressBar.setVisibility(View.VISIBLE);
