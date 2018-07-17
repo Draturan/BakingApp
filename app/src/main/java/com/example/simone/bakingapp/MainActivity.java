@@ -1,5 +1,7 @@
 package com.example.simone.bakingapp;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +28,9 @@ public class MainActivity extends AppCompatActivity
     private static final String SAVE_INGREDIENTS_FRAGMENT = "Instance Ingredients Fragment";
     private static final String TAG_STEPS_FRAGMENT = StepsFragment.class.getName();
     private static final String SAVE_STEPS_FRAGMENT = "Instance Steps Fragment";
-    private static final String SAVING_SWEET= "saveSweet";
+    private static final String SAVING_SWEET = "saveSweet";
+    public static final String WIDGET_SWEET_KEY = "SweetToWidget";
+    public static final String WIDGET_IDS_KEY = "IdsToWidget";
 
     private Sweet lastSweet;
     private IngredientsFragment mIngredientsFragment;
@@ -80,6 +84,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSweetSelected(Sweet sweetClicked) {
+        // sending data to the widget
+        Intent widgetIntent = new Intent(this, SweetWidgetProvider.class);
+        widgetIntent.putExtra(WIDGET_SWEET_KEY, sweetClicked);
+        widgetIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int ids[] = appWidgetManager.getAppWidgetIds(new ComponentName(this, SweetWidgetProvider.class));
+        widgetIntent.putExtra(WIDGET_IDS_KEY, ids);
+        sendBroadcast(widgetIntent);
+
+        // launching intent or data directly to the fragments
         if (mAlignVersion){
             lastSweet = sweetClicked;
             mIngredientList = lastSweet.getIngredients();
@@ -96,7 +110,6 @@ public class MainActivity extends AppCompatActivity
             startDescriptionActivityIntent.putExtra("SweetObj", sweetClicked);
             startActivity(startDescriptionActivityIntent);
         }
-
     }
 
     public void noSelectedSweetDisplay(boolean display){

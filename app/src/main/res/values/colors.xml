@@ -7,4 +7,9 @@
     <color name="white">#ffffff</color>
     <color name="textError">#7c7c7c7c</color>
     <color name="selectedSweet">#FF8FA5B2</color>
+
+    <!--WIDGET-->
+    <color name="widget_background">#c99a77</color>
+    <color name="widget_title_text">#be690f</color>
+    <color name="widget_ingredients_text">#ffe9d9</color>
 </resources>
