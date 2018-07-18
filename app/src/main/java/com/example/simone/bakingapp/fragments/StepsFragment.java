@@ -143,7 +143,6 @@ public class StepsFragment extends Fragment
         super.onSaveInstanceState(outState);
         // Looking if the video is using and decide if save the last instance state or not
         if (isPlaying){
-            stopPlayer(false);
             outState.putLong(CURRENT_VIDEO_POSITION, lastVideoPosition);
         }
         outState.putInt(LAST_STEP_CLICKED, lastStepClicked);
@@ -169,10 +168,18 @@ public class StepsFragment extends Fragment
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if (isPlaying){
+            stopPlayer(true, false);
+        }
+    }
+
+    @Override
     public void onVideoStepClick(int position, View view) {
         // In case a player was already in use stop it and start with a new session on the new step clicked
         if (mExoPlayer != null){
-            stopPlayer(true);
+            stopPlayer(true, true);
             mPlayerView.setPlayer(null);
         }
         lastStepClicked = position;
@@ -202,7 +209,7 @@ public class StepsFragment extends Fragment
     }
 
     public void preparePlayer(Uri mediaUri){
-        // directly from the Exoplayer developer guide https://google.github.io/ExoPlayer/guide.html
+        // directly from the ExoPlayer developer guide https://google.github.io/ExoPlayer/guide.html
         // Measures bandwidth during playback. Can be null if not required.
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         // Produces DataSource instances through which media data is loaded.
@@ -228,15 +235,18 @@ public class StepsFragment extends Fragment
         }
     }
 
-    private void stopPlayer(Boolean release){
+    private void stopPlayer(Boolean release, Boolean reset){
         if (mExoPlayer != null){
             lastVideoPosition = mExoPlayer.getCurrentPosition();
             mExoPlayer.stop();
             if (release){
                 mExoPlayer.release();
                 mExoPlayer = null;
+            }
+            if (reset){
                 lastVideoPosition = null;
             }
+
         }
     }
 

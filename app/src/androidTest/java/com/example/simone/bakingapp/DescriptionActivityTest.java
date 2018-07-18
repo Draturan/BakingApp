@@ -17,33 +17,34 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
- * Created by Simone on 28/06/2018 for BakingApp project
+ * Created by Simone on 18/07/2018 for BakingApp project
  */
 @RunWith(AndroidJUnit4.class)
-public class SweetListMasterTest {
+public class DescriptionActivityTest {
 
-    private static final String FIRST_SWEET = "Nutella Pie";
-    private static final String THIRD_SWEET_INGREDIENT = "baking powder";
+    private static final String THIRD_SWEET_NAME = "Yellow Cake";
+    private static final String SECOND_SWEET_STEP = "2. Combine the cake flour, 400 grams " +
+            "(2 cups) of sugar, baking powder, and 1 teaspoon of salt in the bowl of a stand " +
+            "mixer. Using the paddle attachment, beat at low speed until the dry ingredients " +
+            "are mixed together, about one minute";
 
     @Rule
-    public ActivityTestRule<MainActivity> mainActivityActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-
+    public ActivityTestRule<MainActivity> mainActivityActivityTestRule =
+            new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void mainSweetListTest(){
-
+    public void stepDataTest(){
         //Find the RecyclerView and scroll the second item
-        onView(ViewMatchers.withId(R.id.rv_sweets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(1,scrollTo()));
+        onView(ViewMatchers.withId(R.id.rv_sweets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(2,scrollTo()));
         //check the name of the sweet
-        onView(withText(FIRST_SWEET)).check(matches(isDisplayed()));
+        onView(withText(THIRD_SWEET_NAME)).check(matches(isDisplayed()));
 
         //Find and click on the third item
         onView(ViewMatchers.withId(R.id.rv_sweets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(2,click()));
         //Scroll to the third ingredient
-        onView(ViewMatchers.withId(R.id.rv_ingredients_list)).perform(RecyclerViewActions.actionOnItemAtPosition(2,scrollTo()));
+        onView(ViewMatchers.withId(R.id.rv_steps_list)).perform(RecyclerViewActions.actionOnItemAtPosition(2,scrollTo()));
         //find the ingredient inside ingredients recyclerView
-        onView(withText(THIRD_SWEET_INGREDIENT)).check(matches(isDisplayed()));
+        onView(withText(SECOND_SWEET_STEP)).check(matches(isDisplayed()));
     }
-
 
 }
