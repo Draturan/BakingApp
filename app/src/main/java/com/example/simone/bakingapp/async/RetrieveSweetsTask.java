@@ -1,6 +1,5 @@
 package com.example.simone.bakingapp.async;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.simone.bakingapp.utils.NetworkUtils;
