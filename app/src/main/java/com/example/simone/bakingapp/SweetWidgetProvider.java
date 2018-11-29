@@ -28,7 +28,7 @@ public class SweetWidgetProvider extends AppWidgetProvider {
         if (sweetName != null){
             sweetName = sweetName + widgetText;
         }else{
-            sweetName = "SWEEN" + widgetText;
+            sweetName = "SWEET" + widgetText;
         }
 
 
